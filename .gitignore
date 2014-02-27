@@ -2,3 +2,4 @@
 /dist/
 *.swp
 .dist-scion
+cabal-dev/

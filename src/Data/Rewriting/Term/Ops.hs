@@ -108,3 +108,9 @@ isInstanceOf t u = isJust (match u t)
 -- | Check whether a term is a variant of another.
 isVariantOf :: (Eq f, Ord v, Ord v') => Term f v -> Term f v' -> Bool
 isVariantOf t u = isInstanceOf t u && isInstanceOf u t
+
+-- | Orients terms.
+orient :: (Ord f, Ord v) => Term f v -> Term f v -> (Term f v, Term f v)
+orient t1 t2
+  | t1 >= t2 = (t1, t2)
+  | otherwise = (t2, t1)

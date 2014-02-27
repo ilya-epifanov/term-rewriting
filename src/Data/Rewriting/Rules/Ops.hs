@@ -26,6 +26,8 @@ import Data.Rewriting.Rule (Rule)
 import Data.Rewriting.Term (Term)
 import qualified Data.Rewriting.Term as Term
 import qualified Data.Rewriting.Rule as Rule
+import qualified Data.Map as M
+import qualified Data.List as L
 
 
 -- | @lhss rs@ returns the list of left-hand sides of @rs@
@@ -106,3 +108,9 @@ isValid = all Rule.isValid
 -- the given predicate.
 restrictFuns :: (f -> Bool) -> [Rule f v] -> [Rule f v]
 restrictFuns funp = filter (all funp . Rule.funs)
+
+-- | Rewrite variables in the canonical order
+canonify :: [v] -> Rule f v -> Rule f v
+canonify vs r@(Rule lhs rhs) =
+  Rule (Term.map id (mapping !) lhs) (Term.map id (mapping !) rhs) where
+    mapping = M.fromList (zip (L.nub $ vars r) vs)

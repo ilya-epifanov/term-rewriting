@@ -5,7 +5,7 @@
 
 -- Main test driver.
 
-module Main (main) where
+module Main (main, tests) where
 
 import qualified Pos
 import qualified Term
@@ -23,6 +23,7 @@ properties = [
     ("Pos.propParallelTo", property Pos.propParallelTo),
     ("Term.propReplaceAt1", property Term.propReplaceAt1),
     ("Term.propReplaceAt2", property Term.propReplaceAt2),
+    ("Term.propTermsAreComparable", property Term.propTermsAreComparable),
     ("Rule.propLeftRightLinearDual", property Rule.propLeftRightLinearDual),
     ("Rule.propCollapsingExpandingDual", property Rule.propCollapsingExpandingDual),
     ("Rule.propErasingCreatingDual", property Rule.propErasingCreatingDual),

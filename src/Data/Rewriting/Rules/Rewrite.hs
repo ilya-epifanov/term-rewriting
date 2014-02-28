@@ -3,7 +3,7 @@
 --
 -- Authors: Bertram Felgenhauer, Ilya Epifanov
 
-{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE BangPatterns, FlexibleContexts #-}
 -- |
 -- Simple rewriting.
 --
@@ -18,8 +18,9 @@ module Data.Rewriting.Rules.Rewrite (
     innerRewrite,
     rootRewrite,
     reduceTerm,
-    reduceRule,
+--    reduceRule,
     reduceAxiom,
+    converge,
     -- * utilities not reexported from "Data.Rewriting.Rules"
     nested,
     listContexts,
@@ -99,11 +100,16 @@ listContexts = go 0 id where
     go !n f [] = []
     go !n f (x:xs) = (n, f . (: xs), x) : go (n+1) (f . (x:)) xs
 
-reduceTerm :: (Eq f, Ord v, Ord f) => [Rule f v] -> Term f v -> Term f v
+reduceTerm :: (Eq f, Ord (Term f v), Ord v) => [Rule f v] -> Term f v -> Term f v
 reduceTerm rs t = minimum $ t:(result <$> fullRewrite rs t)
 
-reduceRule :: (Eq f, Ord f, Ord v) => [Rule f v] -> Rule f v -> Rule f v
-reduceRule rs (Rule lhs rhs) = Rule (reduceTerm rs lhs) (reduceTerm rs rhs)
+--reduceRule :: (Eq f, Ord f, Ord v) => [Rule f v] -> Rule f v -> Rule f v
+--reduceRule rs (Rule lhs rhs) = Rule (reduceTerm rs lhs) (reduceTerm rs rhs)
 
 reduceAxiom :: (Eq f, Ord f, Ord v) => [Rule f v] -> Axiom f v -> Axiom f v
 reduceAxiom rs (Axiom e1 e2) = Axiom (reduceTerm rs e1) (reduceTerm rs e2)
+
+converge :: (Eq x) => (x -> x) -> x -> x
+converge f x | x == y     = x
+             | otherwise = converge f y
+  where y = f x

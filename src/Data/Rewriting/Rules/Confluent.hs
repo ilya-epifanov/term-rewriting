@@ -13,7 +13,7 @@ module Data.Rewriting.Rules.Confluent (
 import Data.Rewriting.Problem as Problem
 import Data.Rewriting.CriticalPair as CP (cps', toAxiom)
 import Data.Rewriting.Rule as Rule (Rule(..), canonify, isTrivial)
-import Data.Rewriting.Rules.Rewrite (reduceRule, reduceAxiom)
+import Data.Rewriting.Rules.Rewrite (reduceAxiom)
 import Data.Rewriting.Term as Term (Term)
 import Data.Rewriting.Axiom as Axiom
 import qualified Data.Rewriting.Term as Term
@@ -30,12 +30,12 @@ reduceAndOrient rs a = Axiom.orient $ reduceAxiom rs a
 
 addCompletions :: (Pretty f, Pretty v, Show f, Show v, Eq f, Ord f, Ord v)
                   => [v] -> [Rule f v] -> [Rule f v]
-addCompletions vs rs = trace "-- adding completions --" $! foldl addCompletion [] $ rs ++ (orient . CP.toAxiom <$> cps' rs)
-  where addCompletion rs' r'
+addCompletions vs rs = trace "-- adding completions --" $! foldl addCompletion [] $ (Axiom.fromRule <$> rs) ++ (CP.toAxiom <$> cps' rs)
+  where addCompletion rs' a'
           | Rule.isTrivial r'' = trace ("trivial: " ++ pp_ r'') rs'
           | r'' `elem` rs' = trace ("elem: " ++ pp_ r'') rs'
           | otherwise = trace ("new: " ++ pp_ r'') $ r'':rs'
-          where r'' = Rule.canonify vs $ reduceRule rs' r'
+          where r'' = Rule.canonify vs $ Axiom.orient $ reduceAxiom rs' a'
 
 knuthBendix :: (Pretty f, Pretty v, Show f, Show v, Ord (Term f v), Ord f, Eq f, Ord v) => [v] -> [Axiom f v] -> [Rule f v]
 knuthBendix vs as = inner as []
